@@ -71,7 +71,7 @@ public class ATM {
 
     /**
      * TODO: for each bank operation 1-5 ask the user whether he wants to exit from this operation after a failed trial.
-     * TODO: Also don't write "Welcome <name>" every time.
+     * TODO: Also don't write "Welcome [name]" every time.
      * This method is responsible for making bank operations declared by a bank system user.
      *
      * @param theUser A user who makes bank operations.

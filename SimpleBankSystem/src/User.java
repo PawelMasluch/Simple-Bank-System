@@ -101,6 +101,8 @@ public class User {
      * This method checks the matching of a given text with with a user's pin during a logging process.
      *
      * @param pin A text to be checked for matching.
+     *
+     * @return true if an entered pin is correct, false otherwise.
      */
     public boolean validatePIN(String pin) {
         try {
