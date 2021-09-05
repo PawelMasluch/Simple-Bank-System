@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+
 /**
  * A class defining a bank and its functionalities.
  */
@@ -36,6 +37,7 @@ public class Bank {
 
 
     /** This method returns a bank's name.
+     *
      * @return A bank's name.
      * */
     public String getBankName() {
@@ -44,6 +46,7 @@ public class Bank {
 
 
     /** This method creates a new unique user's ID.
+     *
      * @return A new unique user's ID.
      * */
     public String createNewUserUUID() {
@@ -79,6 +82,7 @@ public class Bank {
 
     /**
      * This method returns a new account's UUID (Universal and Unique Identifier).
+     *
      * @return A new account's UUID (Universal and Unique Identifier).
      * */
     public String getNewAccountUUID() {
@@ -113,6 +117,7 @@ public class Bank {
 
     /**
      * This method adds a new account to a bank's accounts' list.
+     *
      * @param account A new account to be added a bank's accounts' list.
      * */
     public void addAccount(Account account) {
@@ -141,8 +146,7 @@ public class Bank {
 
 
     /**
-     * TODO: this method does too much - split it into more methods.
-     * This method adds a new user to a bank's bankUsers' list.
+     * This method adds a new user (with a bank account) to a bank's users' list.
      *
      * @param firstName User's name.
      * @param lastName  User's surname.
@@ -153,7 +157,6 @@ public class Bank {
     public User addUser(String firstName, String lastName, String pin) {
         User newUser = new User(firstName, lastName, pin, this);
         this.bankUsers.add(newUser);
-
 
         Account newAccount = new Account("Savings", newUser, this);
 
@@ -166,8 +169,10 @@ public class Bank {
 
     /**
      * This method returns a user corresponding to a entered pair (userID, pin) or null if such user does not exist.
+     *
      * @param userID An entered user's ID.
      * @param pin An entered user's pin.
+     *
      * @return A user corresponding to a entered pair (userID, pin) or null if such user does not exist.
      * */
     public User userLogin(String userID, String pin) {

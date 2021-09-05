@@ -106,6 +106,7 @@ public class Account {
      *
      * @param amount A transaction's amount.
      * @param memo   An optional transaction's description.
+     *
      * @return A new transaction to a target account.
      */
     public Transaction createTransaction(double amount, String memo) {
@@ -115,7 +116,6 @@ public class Account {
 
     /**
      * This method adds a new transaction to an account's transactions list.
-     * This method uses an another method createTransaction to create transaction.
      *
      * @param transaction A transaction to be considered.
      */

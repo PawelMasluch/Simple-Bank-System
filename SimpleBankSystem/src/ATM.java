@@ -1,9 +1,8 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
+
 /**
- * TODO: this class does too much - split it into more classes.
- * TODO: make variables' names longer.
- * TODO: write about dependencies in methods.
  * Main application class.
  */
 public class ATM {
@@ -40,13 +39,14 @@ public class ATM {
      *
      * @param theBank A bank the user tries to log in to.
      * @param scanner A stream in which a user enters data and the bank system sends its responses.
+     *
      * @return An already logged in bank system user.
      */
     private static User mainMenuPrompt(Bank theBank, Scanner scanner) {
 
-        String userID;
-        String pin;
-        User authentificatedUser;
+        String userID = "";
+        String pin = "";
+        User authentificatedUser = null;
 
         do {
 
@@ -60,7 +60,7 @@ public class ATM {
 
             authentificatedUser = theBank.userLogin(userID, pin);
             if (authentificatedUser == null) {
-                System.out.println("Incorrect user ID/pin combination. " + "Please try again.");
+                System.out.println("\nIncorrect user ID/pin combination. " + "Please try again.");
             }
 
         } while (authentificatedUser == null);
@@ -81,7 +81,7 @@ public class ATM {
 
         //theUser.printAccountsSummary();
 
-        int chosenBankOperationNumber;
+        int chosenBankOperationNumber = 6;
 
         do {
 
@@ -98,9 +98,18 @@ public class ATM {
 
 
             System.out.print("Enter number: ");
-            chosenBankOperationNumber = scanner.nextInt();
-            if (chosenBankOperationNumber < 1 || chosenBankOperationNumber > 6) {
-                System.out.println("Invalid number. Please number 1-6.");
+
+            try {
+                chosenBankOperationNumber = scanner.nextInt();
+            }
+            catch (InputMismatchException ex) {
+                chosenBankOperationNumber = 6;
+            }
+            finally {
+                if (chosenBankOperationNumber < 1 || chosenBankOperationNumber > 6) {
+                    System.out.println("Invalid number. Please number 1-6.\n");
+                    scanner.nextLine();
+                }
             }
 
         } while (chosenBankOperationNumber < 1 || chosenBankOperationNumber > 6);
@@ -152,10 +161,10 @@ public class ATM {
     private static void transferFunds(User theUser, Scanner scanner) {
 
 
-        int sourceAccount;
-        int targetAccount;
-        double amount;
-        double accountBalance;
+        int sourceAccount = -1;
+        int targetAccount = -1;
+        double amount = -1.00;
+        double accountBalance = 0.00;
 
         do {
             System.out.printf("Enter the number (1-%d) of the account\n" +
@@ -163,14 +172,25 @@ public class ATM {
                     theUser.getNumberOfAccounts()
             );
 
-            sourceAccount = scanner.nextInt() - 1;
 
-            if (sourceAccount < 0 || sourceAccount >= theUser.getNumberOfAccounts()) {
-                System.out.println("Invalid account. Please try again");
+            try {
+                sourceAccount = scanner.nextInt() - 1;
             }
+            catch(InputMismatchException ex) {
+                sourceAccount = -1;
+            }
+            finally {
+                if (sourceAccount < 0 || sourceAccount >= theUser.getNumberOfAccounts()) {
+                    System.out.println("Invalid account. Please try again.\n");
+                    scanner.nextLine();
+                }
+            }
+
         } while (sourceAccount < 0 || sourceAccount >= theUser.getNumberOfAccounts());
 
+
         accountBalance = theUser.getAccountBalance(sourceAccount);
+
 
         do {
             System.out.printf("Enter the number (1-%d) of the account\n" +
@@ -178,11 +198,19 @@ public class ATM {
                     theUser.getNumberOfAccounts()
             );
 
-            targetAccount = scanner.nextInt() - 1;
-
-            if (targetAccount < 0 || targetAccount >= theUser.getNumberOfAccounts()) {
-                System.out.println("Invalid account. Please try again");
+            try{
+                targetAccount = scanner.nextInt() - 1;
             }
+            catch(InputMismatchException ex){
+                targetAccount = -1;
+            }
+            finally {
+                if (targetAccount < 0 || targetAccount >= theUser.getNumberOfAccounts()) {
+                    System.out.println("Invalid account. Please try again.\n");
+                    scanner.nextLine();
+                }
+            }
+
         } while (targetAccount < 0 || targetAccount >= theUser.getNumberOfAccounts());
 
 
@@ -195,19 +223,27 @@ public class ATM {
                 System.out.printf("Enter the amount to transfer (max $%.02f): $",
                         accountBalance);
 
-                amount = scanner.nextDouble();
-
-                if (amount < 0.00) {
-                    System.out.println("Amount must be greater than zero.");
-                } else if (amount > accountBalance) {
-                    System.out.printf("Amount must not be greater than\n" + "balance of $%.02f.\n", accountBalance);
+                try{
+                    amount = scanner.nextDouble();
+                }
+                catch (InputMismatchException ex){
+                    amount = -1.00;
+                }
+                finally {
+                    if (amount < 0.00) {
+                        System.out.println("Amount must be greater than zero. Please try again.\n");
+                        scanner.nextLine();
+                    } else if (amount > accountBalance) {
+                        System.out.printf("Amount must not be greater than\n" + "balance of $%.02f.\n", accountBalance);
+                        scanner.nextLine();
+                    }
                 }
 
             } while (amount < 0.00 || amount > accountBalance);
 
             if (amount > 0.00) {
-                theUser.addAccountTransaction(sourceAccount, -1 * amount, String.format("Transfer to account %s", theUser.getAcctUUID(targetAccount)));
-                theUser.addAccountTransaction(targetAccount, amount, String.format("Transfer to account %s", theUser.getAcctUUID(sourceAccount)));
+                theUser.addAccountTransaction(sourceAccount, -1 * amount, String.format("Transfer to account %s", theUser.getAccountUUID(targetAccount)));
+                theUser.addAccountTransaction(targetAccount, amount, String.format("Transfer to account %s", theUser.getAccountUUID(sourceAccount)));
             }
         }
 
@@ -216,7 +252,7 @@ public class ATM {
 
 
     /**
-     * This method makes adeposit of funds to a chosen user's bank account.
+     * This method makes a deposit of funds to a chosen user's bank account.
      *
      * @param theUser A user who makes a deposit of funds.
      * @param scanner A stream in which a user enters data and the bank system sends its responses.
@@ -224,10 +260,10 @@ public class ATM {
     private static void depositFunds(User theUser, Scanner scanner) {
 
 
-        int sourceAccount;
-        double amount;
-        double accountBalance;
-        String memo;
+        int sourceAccount = -1;
+        double amount = -1.00;
+        double accountBalance = 0.00;
+        String memo = "";
 
         do {
             System.out.printf("Enter the number (1-%d) of the account\n" +
@@ -235,49 +271,72 @@ public class ATM {
                     theUser.getNumberOfAccounts()
             );
 
-            sourceAccount = scanner.nextInt() - 1;
-
-            if (sourceAccount < 0 || sourceAccount >= theUser.getNumberOfAccounts()) {
-                System.out.println("Invalid account. Please try again");
+            try{
+                sourceAccount = scanner.nextInt() - 1;
             }
+            catch(InputMismatchException ex) {
+                sourceAccount = -1;
+            }
+            finally {
+                if (sourceAccount < 0 || sourceAccount >= theUser.getNumberOfAccounts()) {
+                    System.out.println("Invalid account. Please try again.\n");
+                    scanner.nextLine();
+                }
+            }
+
         } while (sourceAccount < 0 || sourceAccount >= theUser.getNumberOfAccounts());
 
+
         accountBalance = theUser.getAccountBalance(sourceAccount);
+
 
         do {
             System.out.printf("Enter the amount to transfer (max $%.02f): $",
                     accountBalance);
 
-            amount = scanner.nextDouble();
-
-            if (amount < 0) {
-                System.out.println("Amount must be greater than zero.");
+            try{
+                amount = scanner.nextDouble();
+            }
+            catch(InputMismatchException ex) {
+                System.out.println("\nIncorrect amount entered. Please try again.\n");
+                amount = -1.00;
+            }
+            finally {
+                if (amount < 0.00) {
+                    System.out.println("Amount must be greater than zero.\n");
+                    scanner.nextLine();
+                }
             }
 
-        } while (amount < 0);
+        } while (amount < 0.00);
 
 
         scanner.nextLine();
 
+
         System.out.println("Enter a memo: ");
         memo = scanner.nextLine();
 
-        theUser.addAccountTransaction(sourceAccount, amount, memo);
 
+        if(amount > 0.00){
+            theUser.addAccountTransaction(sourceAccount, amount, memo);
+        }
 
     }
 
 
     /**
-     * @param theUser A user who makes a withdrawal of funds from his bank account.
+     * This method allows a user to withdraw funds from his chosen bank account.
+     *
+     * @param theUser A user who makes a withdrawal of funds from his chosen bank account.
      * @param scanner A stream in which a user enters data and the bank system sends its responses.
      */
     private static void withdrawFunds(User theUser, Scanner scanner) {
 
-        int targetAccount;
-        double amount;
-        double accountBalance;
-        String memo;
+        int targetAccount = -1;
+        double amount = 0.00;
+        double accountBalance = 0.00;
+        String memo = "";
 
         do {
             System.out.printf("Enter the number (1-%d) of the account\n" +
@@ -285,62 +344,93 @@ public class ATM {
                     theUser.getNumberOfAccounts()
             );
 
-            targetAccount = scanner.nextInt() - 1;
-
-            if (targetAccount < 0 || targetAccount >= theUser.getNumberOfAccounts()) {
-                System.out.println("Invalid account. Please try again");
+            try {
+                targetAccount = scanner.nextInt() - 1;
             }
+            catch (InputMismatchException ex) {
+                targetAccount = -1;
+            }
+            finally {
+                if (targetAccount < 0 || targetAccount >= theUser.getNumberOfAccounts()) {
+                    System.out.println("Invalid account. Please try again.\n");
+                    scanner.nextLine();
+                }
+            }
+
         } while (targetAccount < 0 || targetAccount >= theUser.getNumberOfAccounts());
 
+
         accountBalance = theUser.getAccountBalance(targetAccount);
+
 
         do {
             System.out.printf("Enter the amount to withdraw (max $%.02f): $",
                     accountBalance);
 
-            amount = scanner.nextDouble();
-
-            if (amount < 0) {
-                System.out.println("Amount must be greater than zero.");
-            } else if (amount > accountBalance) {
-                System.out.printf("Amount must not be greater than\n" + "balance of $%.02f.\n", accountBalance);
+            try{
+                amount = scanner.nextDouble();
+            }
+            catch (InputMismatchException ex){
+                System.out.println("\nIncorrect amount entered. Please try again.\n");
+                amount = -1.00;
+            }
+            finally {
+                if (amount < 0.00) {
+                    System.out.println("Amount must be greater than zero.\n");
+                    scanner.nextLine();
+                } else if (amount > accountBalance) {
+                    System.out.printf("Amount must not be greater than\n" + "balance of $%.02f.\n", accountBalance);
+                    scanner.nextLine();
+                }
             }
 
-        } while (amount < 0 || amount > accountBalance);
+        } while (amount < 0.00 || amount > accountBalance);
 
 
         scanner.nextLine();
 
+
         System.out.println("Enter a memo: ");
         memo = scanner.nextLine();
 
-        theUser.addAccountTransaction(targetAccount, -1 * amount, memo);
+
+        if(amount > 0.00){
+            theUser.addAccountTransaction(targetAccount, -1 * amount, memo);
+        }
 
     }
 
 
     /**
      * This method prints an information about all transactions connected with a given user's account.
-     * Note. This method uses an another method printAcctTransHistory from a User class.
      *
      * @param theUser A user whom a transaction history of a his chosen account is shown.
      * @param scanner A stream in which a user enters data and the bank system sends its responses.
      */
     private static void showTransactionsHistory(User theUser, Scanner scanner) {
 
-        int theAccount;
+        int theAccount = -1;
 
         do {
             System.out.printf("Enter the number (1-%d) of the account\n" +
                             "whose transactions you want to see: ",
                     theUser.getNumberOfAccounts());
 
-            theAccount = scanner.nextInt() - 1;
-
-            if (theAccount < 0 || theAccount >= theUser.getNumberOfAccounts()) {
-                System.out.println("Invalid account. Please try again");
+            try {
+                theAccount = scanner.nextInt() - 1;
             }
+            catch (InputMismatchException ex){
+                theAccount = -1;
+            }
+            finally {
+                if (theAccount < 0 || theAccount >= theUser.getNumberOfAccounts()) {
+                    System.out.println("Invalid account. Please try again.\n");
+                    scanner.nextLine();
+                }
+            }
+
         } while (theAccount < 0 || theAccount >= theUser.getNumberOfAccounts());
+
 
         theUser.printAccountsTransactionsHistory(theAccount);
 

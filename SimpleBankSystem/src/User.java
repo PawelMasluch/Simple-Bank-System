@@ -90,6 +90,7 @@ public class User {
 
     /**
      * This method adds a new account to a user's accounts list in a given bank.
+     *
      * @param account An account to be added to a user's accounts list in a given bank.
      */
     public void addAccount(Account account) {
@@ -174,7 +175,7 @@ public class User {
      * @param accountIdx A position on a user's accounts list connected with an account to be considered.
      * @return A given user's account's UUID (Universal and Unique Identifier) (in a given bank).
      */
-    public String getAcctUUID(int accountIdx) {
+    public String getAccountUUID(int accountIdx) {
         return this.usersAccounts.get(accountIdx).getAccountsUUID();
     }
 
